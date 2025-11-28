@@ -1,0 +1,20 @@
+{
+    "name": "refractthecode_bingads_node_sdk",
+    "version": "1.0.0",
+    "description": "A Node.js SDK for Microsoft Advertising (Bing Ads) REST APIs",
+    "main": "src/index.js",
+    "author": "Devesh",
+    "license": "MIT",
+    "keywords": [
+        "bingads",
+        "microsoft advertising",
+        "ads api",
+        "rest api",
+        "sdk"
+    ],
+    "dependencies": {
+        "axios": "^1.6.0",
+        "dotenv": "^16.4.0",
+        "qs": "^6.11.2"
+    }
+}
