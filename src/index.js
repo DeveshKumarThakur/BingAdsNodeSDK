@@ -1,4 +1,7 @@
+const CampaignManagement = require("./campaignManagement/campaignManagement");
+const TokenManager = require("./auth/tokenManager");
+
 module.exports = {
-    TokenManager: require("./auth/tokenManager"),
-    CampaignManagement: require("./campaignManagement/campaignManagement")
+    CampaignManagement,
+    TokenManager
 };

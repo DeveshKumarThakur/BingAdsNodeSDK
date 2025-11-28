@@ -1,20 +1,38 @@
-{
-    "name": "refractthecode_bingads_node_sdk",
-    "version": "1.0.0",
-    "description": "A Node.js SDK for Microsoft Advertising (Bing Ads) REST APIs",
-    "main": "src/index.js",
-    "author": "Devesh",
-    "license": "MIT",
-    "keywords": [
-        "bingads",
-        "microsoft advertising",
-        "ads api",
-        "rest api",
-        "sdk"
-    ],
-    "dependencies": {
-        "axios": "^1.6.0",
-        "dotenv": "^16.4.0",
-        "qs": "^6.11.2"
+    {
+        "name": "bingads-node-sdk",
+        "version": "1.0.0",
+        "description": "A Node.js SDK for Microsoft Advertising (Bing Ads) REST APIs. Includes OAuth2 token handling and Campaign Management v13 endpoints.",
+        "main": "src/index.js",
+        "type": "commonjs",
+        "author": "Devesh",
+        "license": "MIT",
+        "homepage": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK#readme",
+        "repository": {
+            "type": "git",
+            "url": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK.git"
+        },
+        "bugs": {
+            "url": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK/issues"
+        },
+        "keywords": [
+            "bingads",
+            "microsoft advertising",
+            "microsoft ads api",
+            "bing ads api",
+            "ads api",
+            "rest api",
+            "sdk",
+            "campaign management",
+            "bing ads sdk",
+            "advertising",
+            "marketing api"
+        ],
+        "scripts": {
+            "test": "node src/examples/campaignManagementExample.js"
+        },
+        "dependencies": {
+            "axios": "^1.6.0",
+            "dotenv": "^16.4.0",
+            "qs": "^6.11.2"
+        }
     }
-}
