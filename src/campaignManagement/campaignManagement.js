@@ -1,54 +1,13 @@
 const axios = require("axios");
-const fs = require("fs");
-const path = require("path");
 const TokenManager = require("../auth/tokenManager");
-const config = require("../../config");
-
-const ACCESS_TOKEN_FILE = path.join(__dirname, "../auth/accessToken.txt");
-
-/**
- * Read file safely
- */
-function readFileSafe(filePath) {
-    try {
-        if (!fs.existsSync(filePath)) return null;
-        const content = fs.readFileSync(filePath, "utf8").trim();
-        return content.length ? content : null;
-    } catch {
-        return null;
-    }
-}
-/**
- * Ensure access token is available
- */
-async function ensureAccessToken() {
-    let token = readFileSafe(ACCESS_TOKEN_FILE);
-    if (token) return token;
-
-    token = await TokenManager.getValidAccessToken();
-
-    const saved = readFileSafe(ACCESS_TOKEN_FILE);
-    return saved || token;
-}
 
 /**
  * POST wrapper for Bing Ads endpoints
  */
 async function bingPost(url, body, headers) {
 
-    console.log("\n==============================");
-    console.log("BING POST DEBUG INFO");
-    console.log("==============================");
-
-    console.log("URL:");
-    console.log(url);
-
-    console.log("\nHEADERS:");
-    console.log(headers);
-
-    console.log("\nBODY:");
-    console.log(JSON.stringify(body, null, 2));
-    console.log("==============================\n");
+    // Debug logging removed for production cleanup, or keep if desired
+    // console.log("BING POST:", url);
 
     try {
         const resp = await axios.post(url, body, { headers });
@@ -74,15 +33,16 @@ class CampaignManagement {
     /**
      * Build request headers
      */
-    static async buildHeaders(customerAccountId, customerId, developerToken) {
-        const accessToken = await ensureAccessToken();
+    static async buildHeaders(customerAccountId, customerId, developerToken, config) {
+        if (!config) {
+            throw new Error("Config object is required for token management");
+        }
 
-        const finalDevToken =
-            developerToken || config.DEVELOPER_TOKEN;
+        const accessToken = await TokenManager.getValidAccessToken(config);
 
-        if (!finalDevToken) {
+        if (!developerToken) {
             throw new Error(
-                "Developer Token missing! Set DEVELOPER_TOKEN in config.js or pass developerToken manually."
+                "Developer Token missing! Pass developerToken manually."
             );
         }
 
@@ -91,7 +51,7 @@ class CampaignManagement {
             "content-type": "application/json",
             "customeraccountid": String(customerAccountId),
             "customerid": String(customerId),
-            "developertoken": finalDevToken
+            "developertoken": developerToken
         };
     }
 
@@ -102,12 +62,14 @@ class CampaignManagement {
         customerAccountId,
         customerId,
         developerToken,
-        campaignTypes = "Search"
+        campaignTypes = "Search",
+        config
     }) {
         const headers = await this.buildHeaders(
             customerAccountId,
             customerId,
-            developerToken
+            developerToken,
+            config
         );
 
         const body = {
@@ -130,17 +92,19 @@ class CampaignManagement {
         customerAccountId,
         customerId,
         campaignIds = [],
-        developerToken
+        developerToken,
+        config
     }) {
         const headers = await this.buildHeaders(
             customerAccountId,
             customerId,
-            developerToken
+            developerToken,
+            config
         );
 
         const body = {
             AccountId: Number(customerAccountId),
-            CampaignIds: campaignIds   // FIXED FORMAT
+            CampaignIds: campaignIds
         };
 
         const url =
@@ -158,12 +122,14 @@ class CampaignManagement {
         customerAccountId,
         customerId,
         campaigns = [],
-        developerToken
+        developerToken,
+        config
     }) {
         const headers = await this.buildHeaders(
             customerAccountId,
             customerId,
-            developerToken
+            developerToken,
+            config
         );
 
         const body = {
@@ -184,12 +150,14 @@ class CampaignManagement {
         customerAccountId,
         customerId,
         campaigns = [],
-        developerToken
+        developerToken,
+        config
     }) {
         const headers = await this.buildHeaders(
             customerAccountId,
             customerId,
-            developerToken
+            developerToken,
+            config
         );
 
         const body = {
@@ -210,12 +178,14 @@ class CampaignManagement {
         customerAccountId,
         customerId,
         campaignIds = [],
-        developerToken
+        developerToken,
+        config
     }) {
         const headers = await this.buildHeaders(
             customerAccountId,
             customerId,
-            developerToken
+            developerToken,
+            config
         );
 
         const body = {
@@ -236,12 +206,14 @@ class CampaignManagement {
         customerAccountId,
         customerId,
         campaignId,
-        developerToken
+        developerToken,
+        config
     }) {
         const headers = await this.buildHeaders(
             customerAccountId,
             customerId,
-            developerToken
+            developerToken,
+            config
         );
 
         const body = {

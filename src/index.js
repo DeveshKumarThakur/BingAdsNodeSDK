@@ -64,7 +64,8 @@ class BingAdsClient {
                     customerAccountId: options.customerAccountId || this.defaultCustomerAccountId,
                     customerId: options.customerId || this.defaultCustomerId,
                     developerToken: this.config.DEVELOPER_TOKEN,
-                    campaignTypes: options.campaignTypes || "Search"
+                    campaignTypes: options.campaignTypes || "Search",
+                    config: this.config
                 });
             },
 
@@ -76,7 +77,8 @@ class BingAdsClient {
                     customerAccountId: options.customerAccountId || this.defaultCustomerAccountId,
                     customerId: options.customerId || this.defaultCustomerId,
                     developerToken: this.config.DEVELOPER_TOKEN,
-                    campaignIds: options.campaignIds
+                    campaignIds: options.campaignIds,
+                    config: this.config
                 });
             },
 
@@ -88,7 +90,8 @@ class BingAdsClient {
                     customerAccountId: options.customerAccountId || this.defaultCustomerAccountId,
                     customerId: options.customerId || this.defaultCustomerId,
                     developerToken: this.config.DEVELOPER_TOKEN,
-                    campaigns: options.campaigns
+                    campaigns: options.campaigns,
+                    config: this.config
                 });
             },
 
@@ -100,7 +103,8 @@ class BingAdsClient {
                     customerAccountId: options.customerAccountId || this.defaultCustomerAccountId,
                     customerId: options.customerId || this.defaultCustomerId,
                     developerToken: this.config.DEVELOPER_TOKEN,
-                    campaigns: options.campaigns
+                    campaigns: options.campaigns,
+                    config: this.config
                 });
             },
 
@@ -112,7 +116,8 @@ class BingAdsClient {
                     customerAccountId: options.customerAccountId || this.defaultCustomerAccountId,
                     customerId: options.customerId || this.defaultCustomerId,
                     developerToken: this.config.DEVELOPER_TOKEN,
-                    campaignIds: options.campaignIds
+                    campaignIds: options.campaignIds,
+                    config: this.config
                 });
             },
 
@@ -124,7 +129,8 @@ class BingAdsClient {
                     customerAccountId: options.customerAccountId || this.defaultCustomerAccountId,
                     customerId: options.customerId || this.defaultCustomerId,
                     developerToken: this.config.DEVELOPER_TOKEN,
-                    campaignId: options.campaignId
+                    campaignId: options.campaignId,
+                    config: this.config
                 });
             }
         };
