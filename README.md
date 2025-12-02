@@ -71,7 +71,7 @@ const client = new BingAdsClient({
 When you run your code for the first time, the SDK will:
 
 1. Generate an OAuth authorization URL
-2. Open it in your default browser (or display it in the console)
+2. Display it in the console for you to open in your browser
 3. Ask you to sign in with your Microsoft Advertising account
 4. Prompt you to paste the authorization code
 5. Exchange it for access and refresh tokens
@@ -258,13 +258,12 @@ const client = new BingAdsClient({
 ### Working with Multiple Accounts
 
 ```javascript
-// Initialize with one account
+// Initialize without default customer/account
 const client = new BingAdsClient({
     clientId: 'your-client-id',
     clientSecret: 'your-client-secret',
     redirectUri: 'http://localhost/myapp/',
-    developerToken: 'your-developer-token',
-    // No default customer/account set
+    developerToken: 'your-developer-token'
 });
 
 await client.authenticate();
@@ -371,40 +370,6 @@ try {
 }
 ```
 
-## 🔧 Development
-
-### Clone and Setup
-
-```bash
-git clone https://github.com/DeveshKumarThakur/BingAdsNodeSDK.git
-cd BingAdsNodeSDK
-npm install
-```
-
-### Run Examples
-
-The `src/examples/` directory contains working examples:
-
-```bash
-# Token management example
-node src/examples/tokenManagerExample.js
-
-# Campaign management example
-node src/examples/campaignManagementExample.js
-```
-
-## 🧪 Testing
-
-```bash
-npm test
-```
-
-## 📋 Requirements
-
-- **Node.js** >= 14.0.0
-- Microsoft Advertising account with API access
-- Azure AD application credentials
-
 ## 🛠️ Troubleshooting
 
 ### "Config object is required"
@@ -429,33 +394,15 @@ node your-script.js
 - Ensure you have permissions to access the customer account
 - Verify your developer token is approved (not in sandbox mode)
 
-## 📦 Publishing to NPM
+## 📋 Requirements
 
-To publish this package to npm:
-
-```bash
-# Login to npm
-npm login
-
-# Publish the package
-npm publish
-```
-
-The `.npmignore` file ensures that only necessary files are published.
-
-## 🤝 Contributing
-
-Contributions are welcome! Please feel free to submit issues and pull requests.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
+- **Node.js** >= 14.0.0
+- Microsoft Advertising account with API access
+- Azure AD application credentials
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details
+MIT License - see [LICENSE](https://github.com/DeveshKumarThakur/BingAdsNodeSDK/blob/main/LICENSE) file for details
 
 ## 🔗 Resources
 
@@ -469,10 +416,6 @@ MIT License - see [LICENSE](LICENSE) file for details
 - **Issues:** [GitHub Issues](https://github.com/DeveshKumarThakur/BingAdsNodeSDK/issues)
 - **Discussions:** [Microsoft Advertising API Forums](https://social.msdn.microsoft.com/Forums/en-US/home?forum=BingAds)
 
-## 🙏 Acknowledgments
-
-Built with ❤️ for the Microsoft Advertising developer community.
-
 ---
 
-**Made by [Devesh Kumar Thakur](https://github.com/DeveshKumarThakur)**
+**Made with ❤️ by [Devesh Kumar Thakur](https://github.com/DeveshKumarThakur)**
