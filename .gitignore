@@ -2,6 +2,9 @@
 node_modules/
 package-lock.json
 
+# Token storage directory (created in user's project)
+.bingads/
+
 # Environment variables
 .env
 .env.local

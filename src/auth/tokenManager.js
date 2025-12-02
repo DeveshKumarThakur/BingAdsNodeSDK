@@ -2,12 +2,18 @@ const axios = require("axios");
 const qs = require("qs");
 const fs = require("fs");
 const path = require("path");
-let config = require("../../config");
 
-// -------------------- File Paths --------------------
-const ACCESS_CODE_FILE = path.join(__dirname, "access_code.txt");
-const ACCESS_TOKEN_FILE = path.join(__dirname, "accessToken.txt");
-const REFRESH_TOKEN_FILE = path.join(__dirname, "refreshToken.txt");
+// -------------------- Configuration --------------------
+// Tokens will be saved in user's project directory under .bingads folder
+const TOKENS_DIR = path.join(process.cwd(), ".bingads");
+const ACCESS_CODE_FILE = path.join(TOKENS_DIR, "access_code.txt");
+const ACCESS_TOKEN_FILE = path.join(TOKENS_DIR, "accessToken.txt");
+const REFRESH_TOKEN_FILE = path.join(TOKENS_DIR, "refreshToken.txt");
+
+// Ensure .bingads directory exists
+if (!fs.existsSync(TOKENS_DIR)) {
+    fs.mkdirSync(TOKENS_DIR, { recursive: true });
+}
 
 // -------------------- Utility Functions --------------------
 
@@ -32,7 +38,11 @@ class TokenManager {
     // ----------------------------------------------------------
     // STEP 1: Generate OAuth Consent URL & Save Access Code
     // ----------------------------------------------------------
-    static async getConsentAndAccessCode() {
+    static async getConsentAndAccessCode(config) {
+        if (!config || !config.CLIENT_ID || !config.REDIRECT_URI) {
+            throw new Error("Config with CLIENT_ID and REDIRECT_URI is required");
+        }
+
         const scope = encodeURIComponent(
             "openid offline_access https://ads.microsoft.com/msads.manage"
         );
@@ -53,7 +63,7 @@ class TokenManager {
         return new Promise(resolve => {
             readline.question("Paste ACCESS CODE here: ", (code) => {
                 writeFile(ACCESS_CODE_FILE, code);
-                console.log("Access code saved → auth/access_code.txt\n");
+                console.log("Access code saved → .bingads/access_code.txt\n");
                 readline.close();
                 resolve(code);
             });
@@ -63,7 +73,10 @@ class TokenManager {
     // ----------------------------------------------------------
     // STEP 2: Exchange ACCESS CODE → ACCESS TOKEN + REFRESH TOKEN
     // ----------------------------------------------------------
-    static async getAccessToken() {
+    static async getAccessToken(config) {
+        if (!config || !config.CLIENT_ID || !config.CLIENT_SECRET || !config.REDIRECT_URI) {
+            throw new Error("Config with CLIENT_ID, CLIENT_SECRET, and REDIRECT_URI is required");
+        }
 
         const accessCode = readFile(ACCESS_CODE_FILE);
         if (!accessCode) {
@@ -95,8 +108,8 @@ class TokenManager {
         writeFile(ACCESS_TOKEN_FILE, json.access_token);
         writeFile(REFRESH_TOKEN_FILE, json.refresh_token);
 
-        console.log("Access Token saved → auth/accessToken.txt");
-        console.log("Refresh Token saved → auth/refreshToken.txt\n");
+        console.log("Access Token saved → .bingads/accessToken.txt");
+        console.log("Refresh Token saved → .bingads/refreshToken.txt\n");
 
         return json.access_token;
     }
@@ -104,7 +117,10 @@ class TokenManager {
     // ----------------------------------------------------------
     // STEP 3: Use refresh_token → Get NEW access_token
     // ----------------------------------------------------------
-    static async getRefreshToken() {
+    static async getRefreshToken(config) {
+        if (!config || !config.CLIENT_ID || !config.CLIENT_SECRET) {
+            throw new Error("Config with CLIENT_ID and CLIENT_SECRET is required");
+        }
 
         const refreshToken = readFile(REFRESH_TOKEN_FILE);
         if (!refreshToken) {
@@ -130,8 +146,8 @@ class TokenManager {
         writeFile(ACCESS_TOKEN_FILE, json.access_token);
         writeFile(REFRESH_TOKEN_FILE, json.refresh_token);
 
-        console.log("New Access Token saved → auth/accessToken.txt");
-        console.log("New Refresh Token saved → auth/refreshToken.txt\n");
+        console.log("New Access Token saved → .bingads/accessToken.txt");
+        console.log("New Refresh Token saved → .bingads/refreshToken.txt\n");
 
         return json.access_token;
     }
@@ -146,7 +162,10 @@ class TokenManager {
     // ----------------------------------------------------------
     // STEP 5: Main function — always returns a valid access token
     // ----------------------------------------------------------
-    static async getValidAccessToken() {
+    static async getValidAccessToken(config) {
+        if (!config) {
+            throw new Error("Config object is required");
+        }
 
         // Step A: Return existing token if available
         const token = readFile(ACCESS_TOKEN_FILE);
@@ -157,13 +176,13 @@ class TokenManager {
 
         if (!accessCode) {
             console.log("No ACCESS CODE found → Starting OAuth Consent Flow...\n");
-            await this.getConsentAndAccessCode();
+            await this.getConsentAndAccessCode(config);
         } else {
-            console.log("Using saved ACCESS CODE from access_code.txt...\n");
+            console.log("Using saved ACCESS CODE from .bingads/access_code.txt...\n");
         }
 
         // Step C: Exchange access code → token
-        return await this.getAccessToken();
+        return await this.getAccessToken(config);
     }
 }
 

@@ -1,5 +1,38 @@
-package.json
-README.md
-LICENSE
-src/
+# Ignore node_modules
+node_modules/
+
+# Ignore token files (these are created in user's project, not in package)
+.bingads/
+*.txt
+
+# Ignore examples (don't publish to npm)
+src/examples/
+
+# Ignore config.js (users will provide their own config)
+config.js
+
+# Ignore test files
+*.test.js
+test/
+
+# Ignore IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Ignore OS files
+.DS_Store
+Thumbs.db
+
+# Ignore git
+.git/
 .gitignore
+
+# Ignore env files
+.env
+.env.*
+
+# Ignore logs
+*.log
+npm-debug.log*

@@ -1,159 +1,99 @@
-const CampaignManagement = require("../campaignManagement/campaignManagement");
-const TokenManager = require("../auth/tokenManager");
+const BingAdsClient = require("../index");
+
+// Example configuration using the new BingAdsClient
+const config = {
+    clientId: "your-client-id",
+    clientSecret: "your-client-secret",
+    redirectUri: "http://localhost/myapp/",
+    developerToken: "your-developer-token",
+    customerId: 300001,
+    customerAccountId: 1000001
+};
 
 (async () => {
     try {
         console.log("============================================");
-        console.log("Bing Ads → Campaign Management JavaScript");
+        console.log("Bing Ads Node SDK - Package Usage Example");
         console.log("============================================\n");
 
-        // Ensure Access Token
-        console.log("Ensuring valid access token...");
-        await TokenManager.getValidAccessToken();
-        console.log("Access Token Ready\n");
+        // Initialize the client
+        const client = new BingAdsClient(config);
 
-        // -------------------------------------------------------------
-        //  MODIFY THESE VALUES BEFORE RUNNING
-        // -------------------------------------------------------------
-        const customerAccountId = 1000001;
-        const customerId = 300001;
-        const developerToken = "Developertokn";
+        // Authenticate (this will handle OAuth flow if needed)
+        console.log("Authenticating...");
+        await client.authenticate();
+        console.log("Authentication successful!\n");
 
-        // A sample campaignId for demonstration 
-        const sampleCampaignId = 500001;
-
-        // A sample campaignIds array (for update, delete, etc.)
-        const campaignIdList = [sampleCampaignId];
-
-        // A sample campaign definition for Add & Update
-        const sampleCampaigns = [
-            {
-                Id: null,
-                Name: "Test Campaign by Node " + Date.now(),
-                Status: "Paused",
-                DailyBudget: 20,
-                BudgetType: "DailyBudgetStandard",
-                TimeZone: "PacificTimeUSCanadaTijuana",
-                Languages: ["English"],
-                TrackingUrlTemplate: null,
-                CampaignType: "Search"
-            }
-        ];
-
-        // =============================================================
-        // QueryByAccountId
-        // =============================================================
-        console.log("==== 1. QueryByAccountId ====");
-
-        const campaigns = await CampaignManagement.getCampaignByAccountId({
-            customerAccountId,
-            customerId,
-            developerToken,
+        // Get all campaigns
+        console.log("==== 1. Get Campaigns by Account ID ====");
+        const campaigns = await client.campaigns.getByAccountId({
             campaignTypes: "Search"
         });
-
         console.log("Response:", JSON.stringify(campaigns, null, 2), "\n");
 
-        // =============================================================
-        // GetCampaignsByIds
-        // =============================================================
-        console.log("==== 2. GetCampaignsByIds ====");
-
-        const campaignDetails = await CampaignManagement.getCampaignsByIds({
-            customerAccountId,
-            customerId,
-            developerToken,
-            campaignIds: campaignIdList
-        });
-
-        console.log("Response:", JSON.stringify(campaignDetails, null, 2), "\n");
-
-        // =============================================================
-        // AddCampaigns
-        // =============================================================
-        console.log("==== 3. AddCampaigns ====");
-
-        const addCampaignResponse = await CampaignManagement.addCampaigns({
-            customerAccountId,
-            customerId,
-            developerToken,
-            campaigns: sampleCampaigns
-        });
-
-        console.log("Response:", JSON.stringify(addCampaignResponse, null, 2), "\n");
-
-        // Extract newly created campaign ID
-        const newCampaignId =
-            addCampaignResponse?.CampaignIds?.long?.[0] ||
-            addCampaignResponse?.CampaignIds?.long;
-
-        // =============================================================
-        // UpdateCampaigns
-        // =============================================================
-        if (newCampaignId) {
-            console.log("==== 4. UpdateCampaigns ====");
-
-            const updatedCampaigns = [
+        // Example: Add a new campaign
+        console.log("==== 2. Add New Campaign ====");
+        const newCampaign = await client.campaigns.add({
+            campaigns: [
                 {
-                    Id: Number(newCampaignId),
-                    Name: "Updated Campaign " + Date.now(),
-                    Status: "Paused"
+                    Name: "Test Campaign from SDK " + Date.now(),
+                    Status: "Paused",
+                    DailyBudget: 20,
+                    BudgetType: "DailyBudgetStandard",
+                    TimeZone: "PacificTimeUSCanadaTijuana",
+                    Languages: ["English"],
+                    CampaignType: "Search"
                 }
-            ];
+            ]
+        });
+        console.log("Response:", JSON.stringify(newCampaign, null, 2), "\n");
 
-            const updateResponse = await CampaignManagement.updateCampaigns({
-                customerAccountId,
-                customerId,
-                developerToken,
-                campaigns: updatedCampaigns
+        const newCampaignId = newCampaign?.CampaignIds?.long?.[0];
+
+        // Example: Update campaign
+        if (newCampaignId) {
+            console.log("==== 3. Update Campaign ====");
+            const updateResponse = await client.campaigns.update({
+                campaigns: [
+                    {
+                        Id: Number(newCampaignId),
+                        Name: "Updated Campaign " + Date.now(),
+                        Status: "Active"
+                    }
+                ]
             });
-
             console.log("Response:", JSON.stringify(updateResponse, null, 2), "\n");
         }
 
-        // =============================================================
-        // DeleteCampaigns
-        // =============================================================
+        // Example: Get ad groups
         if (newCampaignId) {
-            console.log("==== 5. DeleteCampaigns ====");
+            console.log("==== 4. Get Ad Groups ====");
+            const adGroups = await client.campaigns.getAdGroups({
+                campaignId: newCampaignId
+            });
+            console.log("Response:", JSON.stringify(adGroups, null, 2), "\n");
+        }
 
-            const deleteResponse = await CampaignManagement.deleteCampaigns({
-                customerAccountId,
-                customerId,
-                developerToken,
+        // Example: Delete campaign
+        if (newCampaignId) {
+            console.log("==== 5. Delete Campaign ====");
+            const deleteResponse = await client.campaigns.delete({
                 campaignIds: [newCampaignId]
             });
-
             console.log("Response:", JSON.stringify(deleteResponse, null, 2), "\n");
         }
 
-        // =============================================================
-        // GetAdGroupsByCampaignId
-        // =============================================================
-        console.log("==== 6. GetAdGroupsByCampaignId ====");
-
-        const adGroups = await CampaignManagement.getAdGroupsByCampaignId({
-            customerAccountId,
-            customerId,
-            developerToken,
-            campaignId: sampleCampaignId // or newCampaignId if you want
-        });
-
-        console.log("Response:", JSON.stringify(adGroups, null, 2), "\n");
-
         console.log("============================================");
-        console.log("              Examples Completed");
+        console.log("          All Examples Completed");
         console.log("============================================");
 
     } catch (error) {
-        console.error("\n************** API ERROR **************");
-
-        if (error.status) console.error("STATUS:", error.status);
-        if (error.headers) console.error("HEADERS:", error.headers);
-        if (error.data)
-            console.error("ERROR BODY:", JSON.stringify(error.data, null, 2));
-
+        console.error("\n************** ERROR **************");
         console.error("MESSAGE:", error.message || error);
-        console.error("***************************************\n");
+        if (error.response) {
+            console.error("STATUS:", error.response.status);
+            console.error("DATA:", JSON.stringify(error.response.data, null, 2));
+        }
+        console.error("***********************************\n");
     }
 })();

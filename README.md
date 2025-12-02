@@ -1,369 +1,478 @@
 # Bing Ads Node.js SDK
 
-A lightweight Node.js SDK for **Microsoft Advertising (Bing Ads) REST APIs** with OAuth2 authentication and Campaign Management v13 support.
+A lightweight, production-ready Node.js SDK for **Microsoft Advertising (Bing Ads) REST APIs** with OAuth2 authentication and Campaign Management v13 support.
+
+[![npm version](https://badge.fury.io/js/bingads-node-sdk.svg)](https://www.npmjs.com/package/bingads-node-sdk)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## 🚀 Features
 
+- ✅ **Easy Setup** - Install via npm and start in minutes
 - ✅ **OAuth2 Authentication** - Complete token management with automatic refresh
 - ✅ **Campaign Management API v13** - Full CRUD operations for campaigns and ad groups
-- ✅ **REST API Support** - Direct access to Microsoft Advertising endpoints
-- ✅ **Token Persistence** - Automatic token storage and refresh handling
-- ✅ **Easy Setup** - Simple configuration with environment variables
+- ✅ **Token Persistence** - Automatic token storage in your project directory
+- ✅ **Clean API** - Simple, intuitive interface with sensible defaults
 - ✅ **TypeScript Ready** - Works seamlessly with both CommonJS and ES modules
-
-## 📋 Prerequisites
-
-- **Node.js** v14 or higher
-- **Microsoft Advertising Account** ([Sign up here](https://ads.microsoft.com/))
-- **Developer Token** ([Get one here](https://developers.ads.microsoft.com/Account))
-- **Registered Application** with Microsoft Azure ([Register here](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade))
 
 ## 📦 Installation
 
-### 1. Clone the Repository
+```bash
+npm install bingads-node-sdk
+```
+
+## 🔑 Prerequisites
+
+Before using this SDK, you'll need:
+
+1. **Microsoft Advertising Account** - [Sign up here](https://ads.microsoft.com/)
+2. **Developer Token** - [Get one here](https://developers.ads.microsoft.com/Account)
+3. **Azure AD Application** - [Register here](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
+   - You'll need the **Client ID** and **Client Secret**
+   - Configure a **Redirect URI** (e.g., `http://localhost/myapp/`)
+
+### Quick Setup Guide for Azure AD App
+
+1. Go to [Azure Portal - App Registrations](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
+2. Click **"New registration"**
+3. Set name and redirect URI (`http://localhost/myapp/`)
+4. After creation, copy the **Application (client) ID**
+5. Go to **Certificates & secrets** → Create new client secret → Copy the **Value**
+
+## 🎯 Quick Start
+
+```javascript
+const BingAdsClient = require('bingads-node-sdk');
+
+// Initialize the client
+const client = new BingAdsClient({
+    clientId: 'your-azure-client-id',
+    clientSecret: 'your-azure-client-secret',
+    redirectUri: 'http://localhost/myapp/',
+    developerToken: 'your-developer-token',
+    customerId: 123456789,              // Optional: set default customer ID
+    customerAccountId: 987654321        // Optional: set default account ID
+});
+
+(async () => {
+    // Authenticate (handles OAuth flow automatically)
+    await client.authenticate();
+
+    // Get all campaigns
+    const campaigns = await client.campaigns.getByAccountId({
+        campaignTypes: 'Search'
+    });
+
+    console.log('Campaigns:', campaigns);
+})();
+```
+
+### First Time Authentication
+
+When you run your code for the first time, the SDK will:
+
+1. Generate an OAuth authorization URL
+2. Open it in your default browser (or display it in the console)
+3. Ask you to sign in with your Microsoft Advertising account
+4. Prompt you to paste the authorization code
+5. Exchange it for access and refresh tokens
+6. Save tokens to `.bingads/` folder in your project
+
+**Subsequent runs will use the saved tokens automatically.**
+
+## 📚 API Reference
+
+### Constructor
+
+```javascript
+const client = new BingAdsClient(config);
+```
+
+**Config Options:**
+- `clientId` (required) - Azure AD application client ID
+- `clientSecret` (required) - Azure AD application client secret  
+- `redirectUri` (required) - OAuth redirect URI
+- `developerToken` (required) - Microsoft Advertising developer token
+- `customerId` (optional) - Default customer ID for all requests
+- `customerAccountId` (optional) - Default account ID for all requests
+
+### Authentication
+
+#### `client.authenticate()`
+Initialize authentication. Call this before making any API requests.
+
+```javascript
+await client.authenticate();
+```
+
+#### `client.auth.getAccessToken()`
+Get current access token (handles refresh automatically).
+
+```javascript
+const token = await client.auth.getAccessToken();
+```
+
+#### `client.auth.refresh()`
+Manually refresh the access token.
+
+```javascript
+const newToken = await client.auth.refresh();
+```
+
+### Campaign Management
+
+All campaign methods support optional parameters that override defaults:
+- `customerId` - Customer ID for this request
+- `customerAccountId` - Account ID for this request
+
+#### `client.campaigns.getByAccountId(options)`
+Get all campaigns for an account.
+
+```javascript
+const campaigns = await client.campaigns.getByAccountId({
+    campaignTypes: 'Search',           // Optional: 'Search', 'Shopping', 'DynamicSearchAds', etc.
+    customerAccountId: 987654321,      // Optional: override default
+    customerId: 123456789              // Optional: override default
+});
+```
+
+#### `client.campaigns.getByIds(options)`
+Get specific campaigns by their IDs.
+
+```javascript
+const campaigns = await client.campaigns.getByIds({
+    campaignIds: [123, 456, 789]
+});
+```
+
+#### `client.campaigns.add(options)`
+Create new campaigns.
+
+```javascript
+const response = await client.campaigns.add({
+    campaigns: [
+        {
+            Name: 'My Campaign',
+            Status: 'Paused',
+            DailyBudget: 50,
+            BudgetType: 'DailyBudgetStandard',
+            TimeZone: 'PacificTimeUSCanadaTijuana',
+            Languages: ['English'],
+            CampaignType: 'Search'
+        }
+    ]
+});
+
+const newCampaignId = response.CampaignIds.long[0];
+```
+
+#### `client.campaigns.update(options)`
+Update existing campaigns.
+
+```javascript
+await client.campaigns.update({
+    campaigns: [
+        {
+            Id: 123456,
+            Name: 'Updated Campaign Name',
+            Status: 'Active',
+            DailyBudget: 100
+        }
+    ]
+});
+```
+
+#### `client.campaigns.delete(options)`
+Delete campaigns.
+
+```javascript
+await client.campaigns.delete({
+    campaignIds: [123, 456, 789]
+});
+```
+
+#### `client.campaigns.getAdGroups(options)`
+Get ad groups for a specific campaign.
+
+```javascript
+const adGroups = await client.campaigns.getAdGroups({
+    campaignId: 123456
+});
+```
+
+## 💡 Usage Examples
+
+### Creating and Managing a Campaign
+
+```javascript
+const BingAdsClient = require('bingads-node-sdk');
+
+const client = new BingAdsClient({
+    clientId: process.env.BING_CLIENT_ID,
+    clientSecret: process.env.BING_CLIENT_SECRET,
+    redirectUri: process.env.BING_REDIRECT_URI,
+    developerToken: process.env.BING_DEVELOPER_TOKEN,
+    customerId: parseInt(process.env.BING_CUSTOMER_ID),
+    customerAccountId: parseInt(process.env.BING_ACCOUNT_ID)
+});
+
+(async () => {
+    // Authenticate
+    await client.authenticate();
+
+    // Create a new campaign
+    const newCampaign = await client.campaigns.add({
+        campaigns: [{
+            Name: 'Holiday Sale 2024',
+            Status: 'Paused',
+            DailyBudget: 100,
+            BudgetType: 'DailyBudgetStandard',
+            TimeZone: 'PacificTimeUSCanadaTijuana',
+            Languages: ['English'],
+            CampaignType: 'Search'
+        }]
+    });
+
+    const campaignId = newCampaign.CampaignIds.long[0];
+    console.log('Created campaign:', campaignId);
+
+    // Update the campaign
+    await client.campaigns.update({
+        campaigns: [{
+            Id: campaignId,
+            Status: 'Active',
+            DailyBudget: 150
+        }]
+    });
+
+    console.log('Campaign activated with new budget');
+
+    // Get campaign details
+    const details = await client.campaigns.getByIds({
+        campaignIds: [campaignId]
+    });
+
+    console.log('Campaign details:', details);
+})();
+```
+
+### Working with Multiple Accounts
+
+```javascript
+// Initialize with one account
+const client = new BingAdsClient({
+    clientId: 'your-client-id',
+    clientSecret: 'your-client-secret',
+    redirectUri: 'http://localhost/myapp/',
+    developerToken: 'your-developer-token',
+    // No default customer/account set
+});
+
+await client.authenticate();
+
+// Work with Account A
+const campaignsA = await client.campaigns.getByAccountId({
+    customerId: 111111,
+    customerAccountId: 222222,
+    campaignTypes: 'Search'
+});
+
+// Work with Account B
+const campaignsB = await client.campaigns.getByAccountId({
+    customerId: 333333,
+    customerAccountId: 444444,
+    campaignTypes: 'Search'
+});
+```
+
+### Using Environment Variables
+
+Create a `.env` file:
+
+```env
+BING_CLIENT_ID=your-azure-client-id
+BING_CLIENT_SECRET=your-azure-client-secret
+BING_REDIRECT_URI=http://localhost/myapp/
+BING_DEVELOPER_TOKEN=your-developer-token
+BING_CUSTOMER_ID=123456789
+BING_ACCOUNT_ID=987654321
+```
+
+Then in your code:
+
+```javascript
+require('dotenv').config();
+const BingAdsClient = require('bingads-node-sdk');
+
+const client = new BingAdsClient({
+    clientId: process.env.BING_CLIENT_ID,
+    clientSecret: process.env.BING_CLIENT_SECRET,
+    redirectUri: process.env.BING_REDIRECT_URI,
+    developerToken: process.env.BING_DEVELOPER_TOKEN,
+    customerId: parseInt(process.env.BING_CUSTOMER_ID),
+    customerAccountId: parseInt(process.env.BING_ACCOUNT_ID)
+});
+```
+
+## 🔐 Token Storage
+
+The SDK automatically manages OAuth tokens for you:
+
+- Tokens are saved in a `.bingads/` folder in your project root
+- The folder contains:
+  - `access_code.txt` - Authorization code from Microsoft
+  - `accessToken.txt` - Current access token  
+  - `refreshToken.txt` - Refresh token for renewal
+
+**Important:** Add `.bingads/` to your `.gitignore` to avoid committing credentials:
+
+```gitignore
+# Bing Ads tokens
+.bingads/
+```
+
+## 🛠️ Error Handling
+
+```javascript
+try {
+    await client.authenticate();
+    const campaigns = await client.campaigns.getByAccountId({
+        campaignTypes: 'Search'
+    });
+} catch (error) {
+    if (error.response) {
+        // API error
+        console.error('API Error:', error.response.status);
+        console.error('Details:', error.response.data);
+    } else if (error.request) {
+        // Network error
+        console.error('Network Error:', error.message);
+    } else {
+        // Other error
+        console.error('Error:', error.message);
+    }
+}
+```
+
+## 📝 Campaign Object Reference
+
+### Campaign Properties
+
+```javascript
+{
+    Id: number,                    // Campaign ID (required for update/delete)
+    Name: string,                  // Campaign name
+    Status: string,                // 'Active', 'Paused', 'Deleted', 'Suspended'
+    DailyBudget: number,          // Daily budget amount
+    BudgetType: string,           // 'DailyBudgetStandard' or 'DailyBudgetAccelerated'
+    TimeZone: string,             // e.g., 'PacificTimeUSCanadaTijuana'
+    Languages: [string],          // e.g., ['English', 'Spanish']
+    CampaignType: string,         // 'Search', 'Shopping', 'DynamicSearchAds', etc.
+    TrackingUrlTemplate: string   // Optional tracking template
+}
+```
+
+## 🔧 Development
+
+### Clone and Setup
 
 ```bash
 git clone https://github.com/DeveshKumarThakur/BingAdsNodeSDK.git
 cd BingAdsNodeSDK
-```
-
-### 2. Install Dependencies
-
-```bash
 npm install
 ```
 
-### 3. Configure Your Application
+### Run Examples
 
-#### Option A: Using `config.js` (Recommended for local development)
-
-Edit the `config.js` file in the root directory:
-
-```javascript
-module.exports = {
-    CLIENT_ID: "your-azure-app-client-id",
-    CLIENT_SECRET: "your-azure-app-client-secret",
-    REDIRECT_URI: "http://localhost/myapp/",
-    DEVELOPER_TOKEN: "your-microsoft-ads-developer-token"
-};
-```
-
-#### Option B: Using Environment Variables (Recommended for production)
-
-Create a `.env` file in the root directory:
-
-```env
-CLIENT_ID=your-azure-app-client-id
-CLIENT_SECRET=your-azure-app-client-secret
-REDIRECT_URI=http://localhost/myapp/
-DEVELOPER_TOKEN=your-microsoft-ads-developer-token
-```
-
-## 🔑 Getting Your Credentials
-
-### 1. Register an Application in Azure AD
-
-1. Go to [Azure Portal - App Registrations](https://portal.azure.com/#blade/Microsoft_AAD_RegisteredApps/ApplicationsListBlade)
-2. Click **"New registration"**
-3. Fill in the details:
-   - **Name**: Your app name (e.g., "Bing Ads Node SDK")
-   - **Supported account types**: Select appropriate option
-   - **Redirect URI**: Set to `http://localhost/myapp/` (or your custom URI)
-4. Click **"Register"**
-
-### 2. Get Client ID and Client Secret
-
-- **Client ID**: Found on the app's **Overview** page (Application (client) ID)
-- **Client Secret**: 
-  1. Go to **Certificates & secrets** → **Client secrets**
-  2. Click **"New client secret"**
-  3. Copy the **Value** (not the Secret ID)
-
-### 3. Get Developer Token
-
-1. Go to [Microsoft Advertising Developer Account](https://developers.ads.microsoft.com/Account)
-2. Sign in with your Microsoft Advertising credentials
-3. Navigate to **"Account Details"**
-4. Copy your **Developer Token**
-
-### 4. Configure Redirect URI
-
-In your Azure app registration:
-1. Go to **Authentication**
-2. Add platform → **Web**
-3. Set redirect URI to `http://localhost/myapp/` (must match your config)
-
-## 🔐 Authentication Setup
-
-### First Time Authentication
-
-Run the authentication flow to get your access token:
+The `src/examples/` directory contains working examples:
 
 ```bash
+# Token management example
 node src/examples/tokenManagerExample.js
-```
 
-This will:
-1. Generate an OAuth authorization URL
-2. Prompt you to open it in your browser
-3. Ask you to sign in with your Microsoft Advertising account
-4. Redirect you to the redirect URI with an authorization code
-5. Ask you to paste the code back into the terminal
-6. Exchange the code for access and refresh tokens
-7. Save tokens to `src/auth/` directory
-
-**Example Output:**
-```
-=== MICROSOFT AUTHORIZATION URL ===
-https://login.microsoftonline.com/common/oauth2/v2.0/authorize?client_id=...
-
-Open this URL in your browser and sign in.
-
-Paste ACCESS CODE here: <paste-code-here>
-```
-
-### Token Files
-
-After successful authentication, the following files are created:
-- `src/auth/access_code.txt` - Authorization code from Microsoft
-- `src/auth/accessToken.txt` - Current access token
-- `src/auth/refreshToken.txt` - Refresh token for automatic renewal
-
-**⚠️ Security Note**: These files contain sensitive credentials. They are already included in `.gitignore` and should never be committed to version control.
-
-## 🎯 Usage Examples
-
-### Campaign Management
-
-```javascript
-const CampaignManagement = require("./src/campaignManagement/campaignManagement");
-const TokenManager = require("./src/auth/tokenManager");
-
-(async () => {
-    // Ensure valid access token
-    await TokenManager.getValidAccessToken();
-
-    // Your Microsoft Advertising credentials
-    const customerAccountId = 123456789;
-    const customerId = 987654321;
-    const developerToken = "YOUR_DEVELOPER_TOKEN";
-
-    // Get all campaigns
-    const campaigns = await CampaignManagement.getCampaignByAccountId({
-        customerAccountId,
-        customerId,
-        developerToken,
-        campaignTypes: "Search"
-    });
-
-    console.log("Campaigns:", campaigns);
-})();
-```
-
-### Create a Campaign
-
-```javascript
-const newCampaign = await CampaignManagement.addCampaigns({
-    customerAccountId: 123456789,
-    customerId: 987654321,
-    developerToken: "YOUR_DEVELOPER_TOKEN",
-    campaigns: [
-        {
-            Name: "My New Campaign",
-            Status: "Paused",
-            DailyBudget: 50,
-            BudgetType: "DailyBudgetStandard",
-            TimeZone: "PacificTimeUSCanadaTijuana",
-            Languages: ["English"],
-            CampaignType: "Search"
-        }
-    ]
-});
-
-console.log("New Campaign ID:", newCampaign.CampaignIds.long[0]);
-```
-
-### Update a Campaign
-
-```javascript
-const updateResponse = await CampaignManagement.updateCampaigns({
-    customerAccountId: 123456789,
-    customerId: 987654321,
-    developerToken: "YOUR_DEVELOPER_TOKEN",
-    campaigns: [
-        {
-            Id: 456789123,
-            Name: "Updated Campaign Name",
-            Status: "Active"
-        }
-    ]
-});
-
-console.log("Update Response:", updateResponse);
-```
-
-### Get Ad Groups
-
-```javascript
-const adGroups = await CampaignManagement.getAdGroupsByCampaignId({
-    customerAccountId: 123456789,
-    customerId: 987654321,
-    developerToken: "YOUR_DEVELOPER_TOKEN",
-    campaignId: 456789123
-});
-
-console.log("Ad Groups:", adGroups);
-```
-
-## 🧪 Running Examples
-
-### Full Campaign Management Example
-
-```bash
+# Campaign management example
 node src/examples/campaignManagementExample.js
 ```
 
-This example demonstrates:
-- ✅ Getting campaigns by account ID
-- ✅ Getting campaigns by IDs
-- ✅ Creating new campaigns
-- ✅ Updating campaigns
-- ✅ Deleting campaigns
-- ✅ Getting ad groups by campaign ID
+## 🧪 Testing
 
-**Before running**, update the credentials in `src/examples/campaignManagementExample.js`:
-
-```javascript
-const customerAccountId = 1000001;  // Your account ID
-const customerId = 300001;          // Your customer ID
-const developerToken = "YOUR_TOKEN"; // Your developer token
+```bash
+npm test
 ```
 
-## 📚 API Reference
+## 📋 Requirements
 
-### TokenManager
-
-#### `getConsentAndAccessCode()`
-Generates OAuth URL and prompts for authorization code.
-
-#### `getAccessToken()`
-Exchanges authorization code for access and refresh tokens.
-
-#### `getRefreshToken()`
-Uses refresh token to get a new access token.
-
-#### `getValidAccessToken()`
-Returns a valid access token (handles refresh automatically).
-
-### CampaignManagement
-
-#### `getCampaignByAccountId(options)`
-Query campaigns by account ID.
-- **Parameters**: `{ customerAccountId, customerId, developerToken, campaignTypes }`
-- **Returns**: Array of campaigns
-
-#### `getCampaignsByIds(options)`
-Get specific campaigns by their IDs.
-- **Parameters**: `{ customerAccountId, customerId, developerToken, campaignIds }`
-- **Returns**: Campaign details
-
-#### `addCampaigns(options)`
-Create new campaigns.
-- **Parameters**: `{ customerAccountId, customerId, developerToken, campaigns }`
-- **Returns**: Campaign IDs
-
-#### `updateCampaigns(options)`
-Update existing campaigns.
-- **Parameters**: `{ customerAccountId, customerId, developerToken, campaigns }`
-- **Returns**: Update response
-
-#### `deleteCampaigns(options)`
-Delete campaigns.
-- **Parameters**: `{ customerAccountId, customerId, developerToken, campaignIds }`
-- **Returns**: Delete response
-
-#### `getAdGroupsByCampaignId(options)`
-Get ad groups for a specific campaign.
-- **Parameters**: `{ customerAccountId, customerId, developerToken, campaignId }`
-- **Returns**: Array of ad groups
-
-## 🔧 Project Structure
-
-```
-BingAdsNodeSDK/
-├── src/
-│   ├── auth/
-│   │   ├── tokenManager.js          # OAuth2 token management
-│   │   ├── access_code.txt          # Stored authorization code
-│   │   ├── accessToken.txt          # Current access token
-│   │   └── refreshToken.txt         # Refresh token
-│   ├── campaignManagement/
-│   │   └── campaignManagement.js    # Campaign Management API wrapper
-│   ├── utils/
-│   │   └── httpClient.js            # HTTP client utilities
-│   ├── examples/
-│   │   ├── tokenManagerExample.js   # Authentication example
-│   │   └── campaignManagementExample.js  # Campaign management example
-│   └── index.js                     # Main export file
-├── config.js                        # Configuration file
-├── package.json                     # Dependencies and scripts
-├── .gitignore                       # Git ignore rules
-└── README.md                        # This file
-```
+- **Node.js** >= 14.0.0
+- Microsoft Advertising account with API access
+- Azure AD application credentials
 
 ## 🛠️ Troubleshooting
 
+### "Config object is required"
+Make sure you're passing a config object to the BingAdsClient constructor.
+
 ### "ACCESS CODE not found"
-Run `node src/examples/tokenManagerExample.js` to complete the OAuth flow.
+Run your script - it will automatically start the OAuth flow the first time.
 
 ### "REFRESH TOKEN missing"
-Your refresh token has expired. Delete token files and re-authenticate:
+Your refresh token expired. Delete the `.bingads/` folder and re-authenticate:
 ```bash
-rm src/auth/*.txt
-node src/examples/tokenManagerExample.js
+rm -rf .bingads
+node your-script.js
 ```
-
-### "remote: Write access to repository not granted"
-Your access token expired. The SDK will automatically refresh it when you call `getValidAccessToken()`.
 
 ### HTTP 401 Unauthorized
 - Verify your `developerToken` is correct
-- Ensure your access token is valid
-- Check that `customerAccountId` and `customerId` are correct
+- Check that `customerId` and `customerAccountId` are correct
+- Token may have expired - the SDK will automatically refresh it
 
-### HTTP 403 Forbidden
-- Verify you have permissions to access the customer account
-- Ensure your developer token is approved (not in sandbox)
+### HTTP 403 Forbidden  
+- Ensure you have permissions to access the customer account
+- Verify your developer token is approved (not in sandbox mode)
 
-## 📝 Notes
+## 📦 Publishing to NPM
 
-- Access tokens expire after **1 hour**
-- Refresh tokens are valid for **90 days**
-- Always use `getValidAccessToken()` before making API calls
-- Token files are automatically managed by the SDK
-- The SDK supports both sandbox and production environments
+To publish this package to npm:
+
+```bash
+# Login to npm
+npm login
+
+# Publish the package
+npm publish
+```
+
+The `.npmignore` file ensures that only necessary files are published.
 
 ## 🤝 Contributing
 
-Contributions are welcome! Please feel free to submit a Pull Request.
+Contributions are welcome! Please feel free to submit issues and pull requests.
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
 
 ## 📄 License
 
-MIT License - see LICENSE file for details
+MIT License - see [LICENSE](LICENSE) file for details
 
 ## 🔗 Resources
 
 - [Microsoft Advertising API Documentation](https://docs.microsoft.com/en-us/advertising/guides/)
 - [Campaign Management API Reference](https://docs.microsoft.com/en-us/advertising/campaign-management-service/)
-- [OAuth 2.0 Authentication](https://docs.microsoft.com/en-us/advertising/guides/authentication-oauth)
+- [OAuth 2.0 Authentication Guide](https://docs.microsoft.com/en-us/advertising/guides/authentication-oauth)
 - [Developer Portal](https://developers.ads.microsoft.com/)
 
 ## 💬 Support
 
-For issues and questions:
-- Open an issue on [GitHub Issues](https://github.com/DeveshKumarThakur/BingAdsNodeSDK/issues)
-- Check [Microsoft Advertising API Forums](https://social.msdn.microsoft.com/Forums/en-US/home?forum=BingAds)
+- **Issues:** [GitHub Issues](https://github.com/DeveshKumarThakur/BingAdsNodeSDK/issues)
+- **Discussions:** [Microsoft Advertising API Forums](https://social.msdn.microsoft.com/Forums/en-US/home?forum=BingAds)
+
+## 🙏 Acknowledgments
+
+Built with ❤️ for the Microsoft Advertising developer community.
 
 ---
 
-**Made with ❤️ by [Devesh Kumar Thakur](https://github.com/DeveshKumarThakur)**
+**Made by [Devesh Kumar Thakur](https://github.com/DeveshKumarThakur)**
