@@ -1,6 +1,6 @@
-    {
+{
         "name": "bingads-node-sdk",
-        "version": "1.0.0",
+        "version": "1.0.1",
         "description": "A lightweight Node.js SDK for Microsoft Advertising (Bing Ads) REST APIs with OAuth2 authentication and Campaign Management v13 support.",
         "main": "src/index.js",
         "type": "commonjs",
@@ -8,42 +8,42 @@
         "license": "MIT",
         "homepage": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK#readme",
         "repository": {
-            "type": "git",
-            "url": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK.git"
+                "type": "git",
+                "url": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK.git"
         },
         "bugs": {
-            "url": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK/issues"
+                "url": "https://github.com/DeveshKumarThakur/BingAdsNodeSDK/issues"
         },
         "keywords": [
-            "bingads",
-            "microsoft advertising",
-            "microsoft ads api",
-            "bing ads api",
-            "ads api",
-            "rest api",
-            "sdk",
-            "campaign management",
-            "bing ads sdk",
-            "advertising",
-            "marketing api",
-            "oauth2",
-            "microsoft ads"
+                "bingads",
+                "microsoft advertising",
+                "microsoft ads api",
+                "bing ads api",
+                "ads api",
+                "rest api",
+                "sdk",
+                "campaign management",
+                "bing ads sdk",
+                "advertising",
+                "marketing api",
+                "oauth2",
+                "microsoft ads"
         ],
         "engines": {
-            "node": ">=14.0.0"
+                "node": ">=14.0.0"
         },
         "scripts": {
-            "test": "echo \"Error: no test specified\" && exit 1"
+                "test": "echo \"Error: no test specified\" && exit 1"
         },
         "dependencies": {
-            "axios": "^1.6.0",
-            "dotenv": "^16.4.0",
-            "qs": "^6.11.2"
+                "axios": "^1.6.0",
+                "dotenv": "^16.4.0",
+                "qs": "^6.11.2"
         },
         "files": [
-            "src/**/*.js",
-            "!src/examples/**",
-            "README.md",
-            "LICENSE"
+                "src/**/*.js",
+                "!src/examples/**",
+                "README.md",
+                "LICENSE"
         ]
-    }
+}
