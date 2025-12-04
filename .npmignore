@@ -14,6 +14,7 @@ config.js
 # Ignore test files
 *.test.js
 test/
+test-*.js
 
 # Ignore IDE files
 .vscode/
@@ -36,3 +37,6 @@ Thumbs.db
 # Ignore logs
 *.log
 npm-debug.log*
+
+# Ignore development files
+.npmignore

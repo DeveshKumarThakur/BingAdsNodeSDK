@@ -169,7 +169,10 @@ class TokenManager {
 
         // Step A: Return existing token if available
         const token = readFile(ACCESS_TOKEN_FILE);
-        if (token) return token;
+        if (token) {
+            console.log("✅ Using cached access token from .bingads/accessToken.txt\n");
+            return token;
+        }
 
         // Step B: No stored token → Check if we have access code
         const accessCode = readFile(ACCESS_CODE_FILE);

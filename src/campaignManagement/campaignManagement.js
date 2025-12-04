@@ -6,14 +6,27 @@ const TokenManager = require("../auth/tokenManager");
  */
 async function bingPost(url, body, headers) {
 
-    // Debug logging removed for production cleanup, or keep if desired
-    // console.log("BING POST:", url);
+    // Debug logging
+    console.log("\n=== BING API REQUEST ===");
+    console.log("URL:", url);
+    console.log("\nRequest Body:", JSON.stringify(body, null, 2));
+    console.log("\nRequest Headers:", JSON.stringify(headers, null, 2));
+    console.log("========================\n");
 
     try {
         const resp = await axios.post(url, body, { headers });
+
+        console.log("✅ Response Status:", resp.status);
+        console.log("Response Data:", JSON.stringify(resp.data, null, 2));
+
         return resp.data;
     } catch (err) {
         if (err.response) {
+            console.error("\n❌ API Error Response:");
+            console.error("Status:", err.response.status);
+            console.error("Headers:", JSON.stringify(err.response.headers, null, 2));
+            console.error("Data:", JSON.stringify(err.response.data, null, 2));
+
             const e = new Error("Bing Ads API request failed");
             e.status = err.response.status;
             e.headers = err.response.headers;

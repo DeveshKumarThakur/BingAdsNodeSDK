@@ -37,3 +37,6 @@ pids/
 # OAuth tokens and credentials
 tokens.json
 credentials.json
+
+# Test files (temporary)
+test-*.js
