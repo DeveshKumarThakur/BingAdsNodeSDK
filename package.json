@@ -1,6 +1,6 @@
 {
         "name": "bingads-node-sdk",
-        "version": "1.0.4",
+        "version": "1.0.5",
         "description": "A lightweight Node.js SDK for Microsoft Advertising (Bing Ads) REST APIs with OAuth2 authentication and Campaign Management v13 support.",
         "main": "src/index.js",
         "type": "commonjs",

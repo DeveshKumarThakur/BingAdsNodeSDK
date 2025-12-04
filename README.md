@@ -70,6 +70,17 @@ npm install
 node src/examples/demo.js  # Edit demo.js with your credentials first
 ```
 
+## Author & Connect
+
+Built by **Devesh Kumar Thakur**
+
+Connect with me:
+- 🐙 GitHub: [DeveshKumarThakur](https://github.com/DeveshKumarThakur)
+- 💼 LinkedIn: [kumardeveshthakur](https://www.linkedin.com/in/kumardeveshthakur/)
+- 🌐 Linktree: [kumardeveshthakur](https://linktr.ee/kumardeveshthakur)
+
+If you find this SDK helpful, feel free to ⭐ star the repository and connect!
+
 ## License
 
 MIT
